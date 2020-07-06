@@ -5,45 +5,43 @@
 </head>
 <body>
     <form class="login-form" action="#" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username">
-        <label for="password">Password:</label>
-        <input type="text" id="password" name="password">
-        <label for="email">E-mail:</label>
-        <input type="text" id="email" name="email">
-        <button type="submit">Submit</button>
+        <div class="container" id="login-container">
+            <p class="login-header">Login</p>
+            <div class="field">
+            <label for="log-username">Username:</label>
+            <input type="text" id="username" name="username" autocomplete="off">
+            </div>
+            <div class="field">
+            <label for="log-password">Password:</label>
+            <input type="password" id="password" name="password">
+            </div>
+            <div class="submit-container">
+                <button type="submit">Submit</button>
+            </div>
+            <p class="login-footer"><a href="#" id="log-link">Not a member?</a></p>
+        </div>
     </form>
-    <script>
-        //https://www.learnwithjason.dev/blog/get-form-values-as-json/
-        const formToJson = elements => [].reduce.call(elements, (data, element) => {
-            if (isValidElement(element)) {
-                data[element.name] = element.value;
-            }
-
-            return data;
-        }, {});
-
-        const handleFormSubmit = event => {
-            event.preventDefault();
-            const data = formToJson(form.elements);
-            fetch('http://127.0.0.1:8000/api/register', {
-                method:'POST',
-                headers: {
-                    'Accept': 'application/json, text/plain, */*',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then((res) => JSON.stringify(res.text()))
-                .then((data) => console.log(data))
-        };
-
-        const isValidElement = element => {
-            return element.name && element.value;
-        }
-            
-        const form = document.querySelector('.login-form');
-        form.addEventListener('submit', handleFormSubmit);
-    </script>
+    <form class="register-form" action="#" method="POST">
+        <div class="container" id="register-container">
+            <p class="login-header">Register</p>
+            <div class="field">
+            <label for="reg-username">Username:</label>
+            <input type="text" id="username" name="username" autocomplete="off">
+            </div>
+            <div class="field">
+            <label for="reg-password">Password:</label>
+            <input type="password" id="password" name="password">
+            </div>
+            <div class="field">
+            <label for="reg-email">E-mail:</label>
+            <input type="text" id="email" name="email" autocomplete="off">
+            </div>
+            <div class="submit-container">
+                <button type="submit">Submit</button>
+            </div>
+            <p class="login-footer"><a href="#" id="reg-link">Already a member?</a></p>
+        </div>
+    </form>
+    <script = type="text/javascript" src="login.js"></script>
 </body>
 

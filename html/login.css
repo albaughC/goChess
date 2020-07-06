@@ -1,3 +1,59 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
 body {
-    background-color: orange;
+    background-image: url(./img/loginbackground2.jpg);
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.container {
+    background-color: #b8946a;
+    border-width:3px;
+    border-style:solid;
+    border-radius:10px;
+    display:flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items:flex-end;
+    align-content: center;
+    padding:10px 50px;
+}
+
+.field {
+    padding: 6px;
+    font-family:roboto;
+    font-size:20px;
+}
+
+.submit-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding-top: 5px;
+}
+
+.login-header {
+    font-family:roboto;
+    font-weight:bold;
+    align-self:center;
+
+}
+
+.login-footer {
+    font-family:roboto;
+    display:flex;
+}
+
+#login-container {
+    display:"";
+}
+
+#register-container {
+    display:none;
 }
