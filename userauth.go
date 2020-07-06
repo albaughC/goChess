@@ -5,75 +5,86 @@ package goChess
 import (
 	"context"
 	"encoding/json"
+	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"reflect"
 	"time"
 )
 
 //This seems bad.  Why do I have to export these sensitive fields?
-//Also can I combine these two structs into one?
-//Add Json fields
-type registerData struct {
-	Username string
-	Password string
-	Email    string
+type authData struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
-type loginData struct {
-	Username string
-	Password string
-}
+//This is temporary.  Set ENV variables!
+var store = sessions.NewCookieStore([]byte("topsecret"))
 
-func register(w http.ResponseWriter, r *http.Request) {
-	//Decode data from client
+func handleAuth(w http.ResponseWriter, r *http.Request) {
+	//Decode data from client, route to register/login
 	w.Header().Set("Content-Type", "application/json")
-	var temp registerData
-	json.NewDecoder(r.Body).Decode(&temp)
+	var regData authData
+	json.NewDecoder(r.Body).Decode(&regData)
 
+	if regData.Email != "" {
+		regData.register()
+	} else {
+		regData.login()
+	}
+}
+
+func (regData authData) register() (user, email bool) {
 	//Query DB to ensure unique username/email
 	var userExists, emailExists bool
 	dbconn := connectToDb()
-	err := dbconn.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1);", temp.Username).Scan(&userExists)
-	err = dbconn.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1);", temp.Email).Scan(&emailExists)
+	err := dbconn.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1);", regData.Username).Scan(&userExists)
+	err = dbconn.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1);", regData.Email).Scan(&emailExists)
 	//Create user
 	if !(userExists || emailExists) {
-		hashpass, err := bcrypt.GenerateFromPassword([]byte(temp.Password), bcrypt.MinCost)
+		hashpass, err := bcrypt.GenerateFromPassword([]byte(regData.Password), bcrypt.MinCost)
 		createTime := time.Now()
 		createTime.Format("01-02-2000")
-		log.Println(createTime)
 		res, err := dbconn.Exec(context.Background(),
-			"INSERT INTO users(id,username,password,email,createdate) VALUES (uuid_generate_v4(),$1,$2,$3,$4);", temp.Username, hashpass, temp.Email, createTime)
+			"INSERT INTO users(id,username,password,email,createdate) VALUES (uuid_generate_v4(),$1,$2,$3,$4);", regData.Username, hashpass, regData.Email, createTime)
+		log.Println(reflect.TypeOf(res))
 
 		if err != nil {
 			log.Println(err)
 		}
-		log.Println(res)
 	}
+
 	if err != nil {
 		log.Println(err)
 	}
+	return user, email
 }
 
-func login(w http.ResponseWriter, r *http.Request) {
-	//Decode data from client
-	w.Header().Set("Content-Type", "application/json")
-	var temp loginData
-	json.NewDecoder(r.Body).Decode(&temp)
+func (loginData authData) login() (validUser bool, validPass bool, token bool) { //Your gonna have to return cookie/session info from here, or bad user or bad password.
 	//Fetch and compare password hashes
-	var userExists bool
 	var passHash string
+
 	dbconn := connectToDb()
-	err := dbconn.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1);", temp.Username).Scan(&userExists)
-	err = dbconn.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE password= $1);", passHash).Scan(&passHash)
+	err := dbconn.QueryRow(context.Background(), "SELECT password FROM users WHERE username = $1;", loginData.Username).Scan(&passHash)
+	log.Println(passHash)
+
+	if passHash == "" {
+		return false, false, false
+	}
+
 	storedHash := []byte(passHash)
-	inputText := []byte(temp.Password)
+	inputText := []byte(loginData.Password)
 	err = bcrypt.CompareHashAndPassword(storedHash, inputText)
 
 	if err == nil {
 		//Do login authorization stuff here
 		//Get ID from database and store to Player{id:responsevalue}
+		return true, true, true
 	} else {
-		log.Println("Do stuff that says the password didn't exits, username didn't exist or didn't match")
+		return true, false, false
+		//The passwords didn't match, tell the client
 	}
+
 }

@@ -49,8 +49,7 @@ func main() {
 	origins := handlers.AllowedOrigins([]string{"*"})
 
 	route.HandleFunc("/api/boardstate/{id}", boardState.getBoardState).Methods("GET")
-	route.HandleFunc("/api/login", login).Methods("POST")
-	route.HandleFunc("/api/register", register).Methods("POST")
+	route.HandleFunc("/api/login", handleAuth).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(headers, methods, origins)(route)))
 }
