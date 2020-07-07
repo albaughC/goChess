@@ -1,6 +1,6 @@
 //Handles generation, manipulation, and storage of the board state
 
-package goChess
+package main
 
 import (
 	"encoding/json"
@@ -64,6 +64,7 @@ func standardChessInit(playerOne *Player, playerTwo *Player) [8][8]Tile { //Blit
 		chessBoard[7][l].Piece = &Piece{Color: 'b', PieceType: chessPieces[l], LocationX: l, LocationY: 7}
 		chessBoard[7][l].IsOccupied = true
 	}
+	//Set the user ID for black/white in the board state instead of the player state, since its a function of a game
 	if playerOne.Color == 'w' {
 		for m := range chessBoard[0] {
 			chessBoard[0][m].Piece.Owner = playerOne

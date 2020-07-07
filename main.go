@@ -6,7 +6,7 @@
 //Move highlight
 //Clock inits AFTER you move, so that the first move is not timed.
 
-package goChess
+package main
 
 import (
 	"context"
@@ -37,19 +37,18 @@ func connectToDb() *pgxpool.Pool {
 }
 
 func main() {
-	//Dummy player inits, to be implemented later
-	player1 := Player{'w'}
-	player2 := Player{'b'}
-	boardState := Board{BoardState: standardChessInit(&player1, &player2), Id: 1}
-
+	/*	//Dummy player inits, to be implemented later
+		player1 := Player{'w'}
+		player2 := Player{'b'}
+		boardState := Board{BoardState: standardChessInit(&player1, &player2), Id: 1}
+	*/
 	route := mux.NewRouter()
 
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methods := handlers.AllowedMethods([]string{"POST"})
 	origins := handlers.AllowedOrigins([]string{"*"})
 
-	route.HandleFunc("/api/boardstate/{id}", boardState.getBoardState).Methods("GET")
+	//		route.HandleFunc("/api/boardstate/{id}", boardState.getBoardState).Methods("GET")
 	route.HandleFunc("/api/login", handleAuth).Methods("POST")
-
 	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(headers, methods, origins)(route)))
 }

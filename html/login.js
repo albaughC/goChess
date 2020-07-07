@@ -7,18 +7,17 @@ const formToJson = elements => [].reduce.call(elements, (data, element) => {
 }, {});
 
 const handleFormSubmit = event => {
-    console.log("you are in the fecth");
     event.preventDefault();
-    const data = formToJson(form.elements);
+    const data = formToJson(event.target.elements);
     fetch('http://127.0.0.1:8000/api/login', {
         method:'POST',
         headers: {
             'Accept': 'application/json, text/plain, */*',
             'Content-Type': 'application/json'
-        },
-    body: JSON.stringify(data)
+            },
+        body: JSON.stringify(data)
     })
-    .then((res) => JSON.stringify(res.text()))
+    .then((res) => res.text())
     .then((data) => console.log(data))
 };
 
