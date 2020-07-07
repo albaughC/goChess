@@ -9,46 +9,30 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"log"
 	"net/http"
-	"os"
 )
 
 type Player struct {
-	//	Id    int  `json:"playerId"`
-	Color rune `json:"playerColor"` // 'w' || 'b'
+	Id       string `json:"playerId"`
+	Username string `json:"username"`
+	//	Color rune `json:"playerColor"` // 'w' || 'b'
 	//	clock    *clock
 	//captured [15]rune
 }
 
-func connectToDb() *pgxpool.Pool {
-	dbpool, err := pgxpool.Connect(context.Background(),
-		"DATABASE_URL")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
-	}
-	return dbpool
-}
-
 func main() {
-	/*	//Dummy player inits, to be implemented later
-		player1 := Player{'w'}
-		player2 := Player{'b'}
-		boardState := Board{BoardState: standardChessInit(&player1, &player2), Id: 1}
-	*/
 	route := mux.NewRouter()
 
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
-	methods := handlers.AllowedMethods([]string{"POST"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "HEAD"})
 	origins := handlers.AllowedOrigins([]string{"*"})
+	fs := http.FileServer(http.Dir("./html/"))
 
-	//		route.HandleFunc("/api/boardstate/{id}", boardState.getBoardState).Methods("GET")
 	route.HandleFunc("/api/login", handleAuth).Methods("POST")
-	log.Fatal(http.ListenAndServe(":0", handlers.CORS(headers, methods, origins)(route)))
+	route.PathPrefix("/html").Handler(http.StripPrefix("/html/", fs))
+
+	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(headers, methods, origins)(route)))
 }

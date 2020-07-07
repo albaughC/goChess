@@ -12,9 +12,10 @@ import (
 	"time"
 )
 
+var userMap map[string]*Player
+
 //This is temporary.  Set ENV variables!
 var store = sessions.NewCookieStore([]byte("topsecret"))
-var userMap map[string]*Player
 
 //This seems bad.  Why do I have to export these sensitive fields?
 type authData struct {
@@ -44,6 +45,13 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		log.Println("your in LogData")
 		validUser, validPass := regData.login()
 		if validUser && validPass {
+			_, ok := userMap[regData.Username]
+			if !ok {
+				log.Println("your intantinating a player")
+				userMap["username"] = &Player{Username: regData.Username}
+				//Instantiate Player, store in map
+			}
+
 			log.Println("Your init session")
 			session, _ := store.Get(r, "session-name")
 			session.Values["username"] = regData.Username

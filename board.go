@@ -65,21 +65,21 @@ func standardChessInit(playerOne *Player, playerTwo *Player) [8][8]Tile { //Blit
 		chessBoard[7][l].IsOccupied = true
 	}
 	//Set the user ID for black/white in the board state instead of the player state, since its a function of a game
-	if playerOne.Color == 'w' {
-		for m := range chessBoard[0] {
-			chessBoard[0][m].Piece.Owner = playerOne
-			chessBoard[1][m].Piece.Owner = playerOne
-			chessBoard[6][m].Piece.Owner = playerTwo
-			chessBoard[7][m].Piece.Owner = playerTwo
-		}
-	} else {
-		for m := range chessBoard[0] {
-			chessBoard[0][m].Piece.Owner = playerTwo
-			chessBoard[1][m].Piece.Owner = playerTwo
-			chessBoard[6][m].Piece.Owner = playerOne
-			chessBoard[7][m].Piece.Owner = playerOne
-		}
-	}
+	/*	if playerOne.Color == 'w' {
+			for m := range chessBoard[0] {
+				chessBoard[0][m].Piece.Owner = playerOne
+				chessBoard[1][m].Piece.Owner = playerOne
+				chessBoard[6][m].Piece.Owner = playerTwo
+				chessBoard[7][m].Piece.Owner = playerTwo
+			}
+		} else {
+			for m := range chessBoard[0] {
+				chessBoard[0][m].Piece.Owner = playerTwo
+				chessBoard[1][m].Piece.Owner = playerTwo
+				chessBoard[6][m].Piece.Owner = playerOne
+				chessBoard[7][m].Piece.Owner = playerOne
+			}
+		}*/
 	return chessBoard
 }
 
