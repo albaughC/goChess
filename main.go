@@ -24,6 +24,7 @@ type Player struct {
 }
 
 func main() {
+
 	route := mux.NewRouter()
 
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
@@ -34,5 +35,5 @@ func main() {
 	route.HandleFunc("/api/login", handleAuth).Methods("POST")
 	route.PathPrefix("/html").Handler(http.StripPrefix("/html/", fs))
 
-	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(headers, methods, origins)(route)))
+	log.Fatal(http.ListenAndServe(":0", handlers.CORS(headers, methods, origins)(route)))
 }
