@@ -26,14 +26,14 @@ type Player struct {
 
 func main() {
 	port := os.Getenv("PORT")
+	log.Println("Brining up server on port:" + port)
 	port = ":" + port
-	route := mux.NewRouter()
 
+	route := mux.NewRouter()
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "HEAD"})
 	origins := handlers.AllowedOrigins([]string{"*"})
 	fs := http.FileServer(http.Dir("./html/"))
-
 	route.HandleFunc("/api/login", handleAuth).Methods("POST")
 	route.PathPrefix("/html").Handler(http.StripPrefix("/html/", fs))
 
