@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"os"
 )
 
 type Player struct {
@@ -24,7 +25,8 @@ type Player struct {
 }
 
 func main() {
-
+	port := os.Getenv("PORT")
+	port = ":" + port
 	route := mux.NewRouter()
 
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
@@ -35,5 +37,5 @@ func main() {
 	route.HandleFunc("/api/login", handleAuth).Methods("POST")
 	route.PathPrefix("/html").Handler(http.StripPrefix("/html/", fs))
 
-	log.Fatal(http.ListenAndServe(":0", handlers.CORS(headers, methods, origins)(route)))
+	log.Fatal(http.ListenAndServe(port, handlers.CORS(headers, methods, origins)(route)))
 }
