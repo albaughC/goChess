@@ -28,7 +28,7 @@ type Player struct {
 
 func connectToDb() *pgxpool.Pool {
 	dbpool, err := pgxpool.Connect(context.Background(),
-		"postgresql://topher@127.0.0.1:5432/chesslife")
+		os.Getenv("DATABASE_URL"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
@@ -42,6 +42,7 @@ func main() {
 		player2 := Player{'b'}
 		boardState := Board{BoardState: standardChessInit(&player1, &player2), Id: 1}
 	*/
+	port == os.Getenv("PORT")
 	route := mux.NewRouter()
 
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
@@ -50,5 +51,5 @@ func main() {
 
 	//		route.HandleFunc("/api/boardstate/{id}", boardState.getBoardState).Methods("GET")
 	route.HandleFunc("/api/login", handleAuth).Methods("POST")
-	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(headers, methods, origins)(route)))
+	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(headers, methods, origins)(route)))
 }
