@@ -9,7 +9,7 @@ import (
 
 func connectToDb() *pgxpool.Pool {
 	dbpool, err := pgxpool.Connect(context.Background(),
-		"postgresql://topher@127.0.0.1:5432/chesslife")
+		"DATABASE_URL")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database %v\n", err)
 		os.Exit(1)
