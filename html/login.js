@@ -9,7 +9,7 @@ const formToJson = elements => [].reduce.call(elements, (data, element) => {
 const handleFormSubmit = event => {
     event.preventDefault();
     const data = formToJson(event.target.elements);
-    fetch('http://127.0.0.1:8000/api/login', {
+    fetch('https://chesslife.herokuapp.com/api/login', {
         method:'POST',
         headers: {
             'Accept': 'application/json, text/plain, */*',
