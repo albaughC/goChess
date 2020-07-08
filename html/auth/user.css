@@ -1,0 +1,70 @@
+*{
+    margin:0;
+    padding:0;
+}
+
+.clr {
+    clear:both;
+}
+
+body {
+    background-color:#0b1d51;
+}
+
+header {
+    background-color:#bf6f0d;
+    height: 7vh;
+}
+
+footer {
+    background-color:#bf6f0d;
+}
+.lead-logo {
+    font-family: "Lucida Console";
+    font-style: bold;
+    font-size: 40px;
+    color: #ffffff;
+    display: flex;
+    justify-content:flex-end;
+    flex-direction: column;
+    height:1.5em;
+    text-align: right;
+}
+
+.wrapper {
+    background-color:purple;
+    margin: 15px;
+}
+
+.row {
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.column1 {
+    display: flex;
+    flex-direction: column;
+    width:80%;
+    min-height:1000px;
+}
+
+.column2 {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    min-height:1000px;
+}
+
+
+.main-pane {
+    background-color:blue;
+    height:100px;
+    height:100%;
+}
+
+.user-pane{
+    background-color:orange;
+    height:100px;
+}

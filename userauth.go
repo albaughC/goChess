@@ -120,12 +120,14 @@ func logout() {
 
 func SessionMid(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Your in the middleware")
 		session, _ := store.Get(r, "session-name")
 		if session.IsNew {
 			log.Println("The session is new, there wasn't one before")
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 		}
 		val := session.Values["username"]
+		//Can this line be removed?  And just input [val.string]
 		user, ok := val.(string)
 		i, ok := userMap[user]
 		if !ok {
