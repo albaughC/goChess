@@ -15,7 +15,6 @@ import (
 
 var userMap map[string]*Player
 
-//This is temporary.  Set ENV variables!
 var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 
 //This seems bad.  Why do I have to export these sensitive fields?
@@ -40,19 +39,16 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 			User  bool
 			Email bool
 		}{User: user, Email: email})
-		//This logic is backwards.  If they are both false, a new user was created
 	} else {
 		//Should test whether the user has an active session
-		log.Println("your in LogData")
+		log.Println("your in LoginData")
 		validUser, validPass := regData.login()
 		if validUser && validPass {
 			_, ok := userMap[regData.Username]
 			if !ok {
 				log.Println("your intantinating a player")
 				userMap["username"] = &Player{Username: regData.Username}
-				//Instantiate Player, store in map
 			}
-
 			log.Println("Your init session")
 			session, _ := store.Get(r, "session-name")
 			session.Values["username"] = regData.Username
@@ -73,21 +69,24 @@ func (regData authData) register() (user, email bool) {
 	dbconn := connectToDb()
 	err := dbconn.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1);", regData.Username).Scan(&userExists)
 	err = dbconn.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1);", regData.Email).Scan(&emailExists)
+	//This inverts the queries.  We want to know if the user/email DO NOT exist, so we can create them
+	userExists, emailExists = !userExists, !emailExists
+	defer dbconn.Close(context.Background())
+
+	if err != nil {
+		log.Println(err)
+	}
 	//Create user
-	if !(userExists || emailExists) {
+	if userExists && emailExists {
 		hashpass, err := bcrypt.GenerateFromPassword([]byte(regData.Password), bcrypt.MinCost)
 		createTime := time.Now()
 		createTime.Format("01-02-2000")
 		res, err := dbconn.Exec(context.Background(),
 			"INSERT INTO users(id,username,password,email,createdate) VALUES (uuid_generate_v4(),$1,$2,$3,$4);", regData.Username, hashpass, regData.Email, createTime)
-
+		userExists, emailExists = true, true
 		if err != nil {
-			log.Println(err)
-			log.Println(res)
+			log.Println(res, err)
 		}
-	}
-	if err != nil {
-		log.Println(err)
 	}
 	return userExists, emailExists
 }
@@ -112,7 +111,6 @@ func (loginData authData) login() (validUser bool, validPass bool) { //Your gonn
 	} else {
 		return true, false
 	}
-
 }
 
 func logout() {
