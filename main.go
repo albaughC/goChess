@@ -46,5 +46,5 @@ func main() {
 	route.PathPrefix("/html").Handler(http.StripPrefix("/html/", fs))
 	route.HandleFunc("/api/login", handleAuth).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(headers, methods, origins)(route)))
+	log.Fatal(http.ListenAndServe(port, handlers.CORS(headers, methods, origins)(route)))
 }
