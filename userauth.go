@@ -44,9 +44,13 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		log.Println("your in LoginData")
 		validUser, validPass := regData.login()
 		if validUser && validPass {
-			_, ok := userMap[regData.Username]
+			i, ok := userMap[regData.Username]
+			log.Println(ok)
+			log.Println(i)
+			log.Println(regData.Username)
+
 			if !ok {
-				log.Println("your intantinating a player")
+				log.Println("your making a player")
 				userMap["username"] = &Player{Username: regData.Username}
 			}
 			log.Println("Your init session")
