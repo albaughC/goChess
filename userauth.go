@@ -95,9 +95,12 @@ func (regData authData) register() (user, email bool) {
 func (loginData authData) login() (validUser bool, validPass bool) { //Your gonna have to return cookie/session info from here, or bad user or bad password.
 	//Fetch and compare password hashes
 	var passHash string
-
+	log.Println("In logindata")
 	dbconn := connectToDb()
 	err := dbconn.QueryRow(context.Background(), "SELECT password FROM users WHERE username = $1;", loginData.Username).Scan(&passHash)
+
+	log.Println(passHash)
+	log.Println(loginData.Username)
 
 	if passHash == "" {
 		return false, false
@@ -108,8 +111,10 @@ func (loginData authData) login() (validUser bool, validPass bool) { //Your gonn
 	err = bcrypt.CompareHashAndPassword(storedHash, inputText)
 
 	if err == nil {
+		log.Println("true,true")
 		return true, true
 	} else {
+		log.Println("true,false")
 		return true, false
 	}
 }
@@ -139,6 +144,9 @@ func SessionMid(next http.Handler) http.Handler {
 			log.Println("your intantinating a player")
 			log.Println(i)
 			//Instantiate Player, store in map
+			//Where is this function going to pull player data from?
+			//Pull it from the Session data username
+			//Create a function to query the database, and initialize the player's ID
 		}
 		next.ServeHTTP(w, r)
 	})

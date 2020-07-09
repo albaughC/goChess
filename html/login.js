@@ -9,6 +9,7 @@ const formToJson = elements => [].reduce.call(elements, (data, element) => {
 const handleFormSubmit = event => {
     event.preventDefault();
     const data = formToJson(event.target.elements);
+    
     fetch('https://chesslife.herokuapp.com/api/login', {
         method:'POST',
         headers: {
