@@ -24,13 +24,19 @@ type Player struct {
 	//captured [15]rune
 }
 
+func testFunc(w http.ResponseWriter, r *http.Request) {
+	log.Println("Your in test func")
+}
+
 func main() {
 	port := os.Getenv("PORT")
 	log.Println("Brining up server on port:" + port)
 	port = ":" + port
 
 	route := mux.NewRouter()
-	authRoute := mux.NewRouter()
+	authRoute := route.PathPrefix("/private").Subrouter()
+	authRoute.HandleFunc("/api/testfunc", testFunc).Methods("GET")
+	authRoute.Use(SessionMid)
 
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "HEAD"})
@@ -40,9 +46,5 @@ func main() {
 	route.PathPrefix("/html").Handler(http.StripPrefix("/html/", fs))
 	route.HandleFunc("/api/login", handleAuth).Methods("POST")
 
-	authFS := http.FileServer(http.Dir("./html/auth/"))
-
-	authRoute.PathPrefix("/html/auth").Handler(SessionMid).Handler(http.StripPrefix("/html/", authFS))
-
-	log.Fatal(http.ListenAndServe(port, handlers.CORS(headers, methods, origins)(route)))
+	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(headers, methods, origins)(route)))
 }

@@ -9,13 +9,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
 var userMap map[string]*Player
 
 //This is temporary.  Set ENV variables!
-var store = sessions.NewCookieStore([]byte("topsecret"))
+var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 
 //This seems bad.  Why do I have to export these sensitive fields?
 type authData struct {
@@ -125,6 +126,7 @@ func SessionMid(next http.Handler) http.Handler {
 		if session.IsNew {
 			log.Println("The session is new, there wasn't one before")
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
 		}
 		val := session.Values["username"]
 		//Can this line be removed?  And just input [val.string]
