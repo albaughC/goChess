@@ -54,6 +54,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 			session.Values["username"] = regData.Username
 			session.Values["authenicated"] = true
 			session.Save(r, w)
+			json.NewEncoder(w).Encode(struct{ Login bool }{Login: true})
 		} else {
 			json.NewEncoder(w).Encode(struct {
 				User bool
