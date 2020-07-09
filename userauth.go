@@ -71,7 +71,7 @@ func (regData authData) register() (user, email bool) {
 	err = dbconn.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1);", regData.Email).Scan(&emailExists)
 	//This inverts the queries.  We want to know if the user/email DO NOT exist, so we can create them
 	userExists, emailExists = !userExists, !emailExists
-	defer dbconn.Close(context.Background())
+	defer dbconn.Close()
 
 	if err != nil {
 		log.Println(err)
