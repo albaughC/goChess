@@ -122,10 +122,14 @@ func logout() {
 func SessionMid(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Your in the middleware")
-		session, _ := store.Get(r, "session-name")
+		session, err := store.Get(r, "session-name")
+		if err != nil {
+			log.Println(err)
+		}
+
 		if session.IsNew {
 			log.Println("The session is new, there wasn't one before")
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			http.Redirect(w, r, "/html/login.html", http.StatusSeeOther)
 			return
 		}
 		val := session.Values["username"]
