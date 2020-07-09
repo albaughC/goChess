@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var userMap map[string]*Player
+var userMap map[string]Player
 
 var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 
@@ -51,7 +51,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 
 			if !ok {
 				log.Println("your making a player")
-				userMap["username"] = &Player{Username: regData.Username}
+				userMap["username"] = Player{Username: regData.Username}
 			}
 			log.Println("Your init session")
 			session, _ := store.Get(r, "session-name")
