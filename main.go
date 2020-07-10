@@ -29,8 +29,6 @@ func testFunc(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	//Test is this can be removed now that we have deployed
-
 	var userList chatUsers
 
 	port := os.Getenv("PORT")
@@ -38,7 +36,7 @@ func main() {
 	port = ":" + port
 
 	publicRoute := mux.NewRouter()
-	publicRoute.PathPrefix("/public/")
+	publicRoute.PathPrefix("/public")
 	privateRoute := publicRoute.PathPrefix("/private").Subrouter()
 	privateRoute.Use(SessionMid)
 
