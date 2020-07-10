@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-var userMap map[string]Player
-
 var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 
 //This seems bad.  Why do I have to export these sensitive fields?
@@ -41,29 +39,19 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		}{User: user, Email: email})
 	} else {
 		//Should test whether the user has an active session
-		log.Println("your in LoginData")
 		validUser, validPass := regData.login()
 		if validUser && validPass {
-			i, ok := userMap[regData.Username]
-			log.Println(ok)
-			log.Println(i)
-			log.Println(regData.Username)
-
-			if !ok {
-				log.Println("your making a player")
-				userMap["username"] = Player{Username: regData.Username}
-			}
-			log.Println("Your init session")
-			session, _ := store.Get(r, "session-name")
+			session, _ := store.Get(r, "mySession")
 			session.Values["username"] = regData.Username
 			session.Values["authenicated"] = true
 			session.Save(r, w)
 			json.NewEncoder(w).Encode(struct{ Login bool }{Login: true})
 		} else {
 			json.NewEncoder(w).Encode(struct {
-				User bool
-				Pass bool
-			}{User: validUser, Pass: validPass})
+				User  bool
+				Pass  bool
+				Login bool
+			}{User: validUser, Pass: validPass, Login: false})
 		}
 	}
 }
@@ -99,7 +87,6 @@ func (regData authData) register() (user, email bool) {
 func (loginData authData) login() (validUser bool, validPass bool) { //Your gonna have to return cookie/session info from here, or bad user or bad password.
 	//Fetch and compare password hashes
 	var passHash string
-	log.Println("In logindata")
 	dbconn := connectToDb()
 	err := dbconn.QueryRow(context.Background(), "SELECT password FROM users WHERE username = $1;", loginData.Username).Scan(&passHash)
 
@@ -115,10 +102,8 @@ func (loginData authData) login() (validUser bool, validPass bool) { //Your gonn
 	err = bcrypt.CompareHashAndPassword(storedHash, inputText)
 
 	if err == nil {
-		log.Println("true,true")
 		return true, true
 	} else {
-		log.Println("true,false")
 		return true, false
 	}
 }
@@ -129,28 +114,14 @@ func logout() {
 
 func SessionMid(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Your in the middleware")
-		session, err := store.Get(r, "session-name")
+		session, err := store.Get(r, "mySession")
 		if err != nil {
 			log.Println(err)
 		}
 
 		if session.IsNew {
-			log.Println("The session is new, there wasn't one before")
 			http.Redirect(w, r, "/html/login.html", http.StatusSeeOther)
 			return
-		}
-		val := session.Values["username"]
-		//Can this line be removed?  And just input [val.string]
-		user, ok := val.(string)
-		i, ok := userMap[user]
-		if !ok {
-			log.Println("your intantinating a player")
-			log.Println(i)
-			//Instantiate Player, store in map
-			//Where is this function going to pull player data from?
-			//Pull it from the Session data username
-			//Create a function to query the database, and initialize the player's ID
 		}
 		next.ServeHTTP(w, r)
 	})

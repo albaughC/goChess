@@ -9,7 +9,6 @@
 package main
 
 import (
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -29,22 +28,29 @@ func testFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
+	//Test is this can be removed now that we have deployed
+
+	var userList chatUsers
+
 	port := os.Getenv("PORT")
 	log.Println("Brining up server on port:" + port)
 	port = ":" + port
 
-	route := mux.NewRouter()
-	authRoute := route.PathPrefix("/private").Subrouter()
-	authRoute.HandleFunc("/api/testfunc", testFunc).Methods("GET")
-	authRoute.Use(SessionMid)
+	publicRoute := mux.NewRouter()
+	publicRoute.PathPrefix("/public/")
+	privateRoute := publicRoute.PathPrefix("/private").Subrouter()
+	privateRoute.Use(SessionMid)
 
-	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
-	methods := handlers.AllowedMethods([]string{"GET", "POST", "HEAD"})
-	origins := handlers.AllowedOrigins([]string{"*"})
+	publicfs := http.FileServer(http.Dir("./public/html/"))
+	privatefs := http.FileServer(http.Dir("./private/html/"))
+	publicRoute.PathPrefix("/html").Handler(http.StripPrefix("/html/", publicfs))
+	privateRoute.PathPrefix("/html").Handler(http.StripPrefix("/html/", privatefs))
 
-	fs := http.FileServer(http.Dir("./html/"))
-	route.PathPrefix("/html").Handler(http.StripPrefix("/html/", fs))
-	route.HandleFunc("/api/login", handleAuth).Methods("POST")
+	publicRoute.HandleFunc("/api/login", handleAuth).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(port, handlers.CORS(headers, methods, origins)(route)))
+	privateRoute.HandleFunc("/api/testfunc", testFunc).Methods("GET")
+	privateRoute.HandleFunc("/api/userwebsocket", userList.openUserpageSocket)
+
+	log.Fatal(http.ListenAndServe(port, publicRoute))
 }
