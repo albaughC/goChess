@@ -120,7 +120,7 @@ func SessionMid(next http.Handler) http.Handler {
 		}
 
 		if session.IsNew {
-			http.Redirect(w, r, "/html/login.html", http.StatusSeeOther)
+			http.Redirect(w, r, "/public/html/login.html", http.StatusSeeOther)
 			return
 		}
 		next.ServeHTTP(w, r)

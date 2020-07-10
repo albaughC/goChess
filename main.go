@@ -32,23 +32,21 @@ func main() {
 	var userList chatUsers
 
 	port := os.Getenv("PORT")
-	log.Println("Brining up server on port:" + port)
+	log.Println("Bringing up server on port:" + port)
 	port = ":" + port
 
-	publicRoute := mux.NewRouter()
-	publicRoute.PathPrefix("/public")
-	privateRoute := publicRoute.PathPrefix("/private").Subrouter()
+	r := mux.NewRouter()
+	publicRoute := r.PathPrefix("/public/").Subrouter()
+	privateRoute := r.PathPrefix("/private").Subrouter()
 	privateRoute.Use(SessionMid)
 
 	publicfs := http.FileServer(http.Dir("./public/html/"))
 	privatefs := http.FileServer(http.Dir("./private/html/"))
-	publicRoute.PathPrefix("/html").Handler(http.StripPrefix("/html/", publicfs))
-	privateRoute.PathPrefix("/html").Handler(http.StripPrefix("/html/", privatefs))
+	publicRoute.PathPrefix("/html").Handler(http.StripPrefix("/public/html", publicfs))
+	privateRoute.PathPrefix("/html").Handler(http.StripPrefix("/private/html/", privatefs))
 
 	publicRoute.HandleFunc("/api/login", handleAuth).Methods("POST")
-
-	privateRoute.HandleFunc("/api/testfunc", testFunc).Methods("GET")
 	privateRoute.HandleFunc("/api/userwebsocket", userList.openUserpageSocket)
 
-	log.Fatal(http.ListenAndServe(port, publicRoute))
+	log.Fatal(http.ListenAndServe(port, r))
 }
