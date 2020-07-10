@@ -84,14 +84,11 @@ func (regData authData) register() (user, email bool) {
 	return userExists, emailExists
 }
 
-func (loginData authData) login() (validUser bool, validPass bool) { //Your gonna have to return cookie/session info from here, or bad user or bad password.
+func (loginData authData) login() (validUser bool, validPass bool) {
 	//Fetch and compare password hashes
 	var passHash string
 	dbconn := connectToDb()
 	err := dbconn.QueryRow(context.Background(), "SELECT password FROM users WHERE username = $1;", loginData.Username).Scan(&passHash)
-
-	log.Println(passHash)
-	log.Println(loginData.Username)
 
 	if passHash == "" {
 		return false, false
