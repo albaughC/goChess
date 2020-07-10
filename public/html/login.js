@@ -10,7 +10,7 @@ const handleFormSubmit = event => {
     event.preventDefault();
     const data = formToJson(event.target.elements);
     
-    fetch('https://chesslife.herokuapp.com/api/login', {
+    fetch('https://chesslife.herokuapp.com/public/api/login', {
         method:'POST',
         headers: {
             'Accept': 'application/json, text/plain, */*',
