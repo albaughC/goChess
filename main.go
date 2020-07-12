@@ -46,7 +46,7 @@ func main() {
 	privateRoute.PathPrefix("/html").Handler(http.StripPrefix("/private/html/", privatefs))
 
 	publicRoute.HandleFunc("/api/login", handleAuth).Methods("POST")
-	publicRoute.HandleFunc("/api/userwebsocket", userList.openUserpageSocket)
+	privateRoute.HandleFunc("/api/userwebsocket", userList.openUserpageSocket)
 
 	log.Fatal(http.ListenAndServe(port, r))
 }
