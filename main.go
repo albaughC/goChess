@@ -31,9 +31,14 @@ func main() {
 
 	var userList chatUsers
 
+<<<<<<< HEAD
 	port := os.Getenv("PORT")
 	log.Println("Brining up server on port:" + port)
 	port = ":" + port
+=======
+	port := ":" + os.Getenv("PORT")
+	log.Println("Bringing up server on port:" + port)
+>>>>>>> 9128761... Rolled back previous commit... That was a rollback of a previous
 
 	publicRoute := mux.NewRouter()
 	publicRoute.PathPrefix("/public")
