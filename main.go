@@ -27,6 +27,7 @@ func testFunc(w http.ResponseWriter, r *http.Request) {
 	log.Println("Your in test func")
 }
 
+//Set server timeouts
 func main() {
 
 	var userList chatUsers
@@ -45,7 +46,7 @@ func main() {
 	privateRoute.PathPrefix("/html").Handler(http.StripPrefix("/private/html/", privatefs))
 
 	publicRoute.HandleFunc("/api/login", handleAuth).Methods("POST")
-	privateRoute.HandleFunc("/api/userwebsocket", userList.openUserpageSocket)
+	publicRoute.HandleFunc("/api/userwebsocket", userList.openUserpageSocket)
 
 	log.Fatal(http.ListenAndServe(port, r))
 }
